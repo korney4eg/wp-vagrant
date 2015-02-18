@@ -21,15 +21,16 @@ Vagrant.configure("2") do |config|
     
       
     t1.vm.provision "chef_solo" do |chef|
-      chef.roles_path="roles"
-      chef.add_role("test1")
+#      chef.roles_path="roles"
+#      chef.add_role("test1")
+      chef.add_recipe "wordpress"
       chef.provisioning_path='/tmp/chef-solo'
       chef.cookbooks_path = "librarian-chef/cookbooks"
       chef.verbose_logging= "true"
     end
     
     
-    t1.vm.provision "shell",inline: 'sudo ln -s /opt/VBoxGuestAdditions-4.3.10/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions' 
+    t1.vm.provision "shell",inline: 'sudo ln -sf /opt/VBoxGuestAdditions-4.3.10/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions' 
     
     t1.vm.provider :virtualbox do |vb|
       vb.name = "test1-centos7"
