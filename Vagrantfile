@@ -4,7 +4,58 @@
 
 
 Vagrant.configure(2) do |config|
-		
+		config.vm.define "db" do |db|
+		db.vm.synced_folder "./chef_rpm", "/vagrant", type: "rsync"
+		db.librarian_chef.cheffile_dir = "."
+		config.vm.provision "shell",
+			inline: "sudo rpm -i /vagrant/chef-12.0.3-1.x86_64.rpm"
+		db.vm.hostname = "db"
+		db.vm.network "private_network", ip: "192.168.50.7", virtualbox__intnet: "intnet"
+		db.vm.box = "chef/centos-6.5"
+		db.vm.provider "virtualbox" do |vb|
+			vb.name = "db"
+			vb.gui = true
+		end
+		config.vm.provision "chef_solo" do |chef|
+			chef.cookbooks_path = "cookbooks"
+			chef.roles_path = "roles"
+			chef.add_role("database")
+			chef.json = {
+			"wordpress" => {
+				"db" => {
+					"host" => "192.168.50.7",
+					"server" => "%"
+					}
+				}
+			}
+		end	
+	end	
+		config.vm.define "nfs" do |nfs|
+		nfs.vm.synced_folder "./chef_rpm", "/vagrant", type: "rsync"
+		nfs.librarian_chef.cheffile_dir = "."
+		config.vm.provision "shell",
+			inline: "sudo rpm -i /vagrant/chef-12.0.3-1.x86_64.rpm"
+		nfs.vm.hostname = "nfs"
+		nfs.vm.network "private_network", ip: "192.168.50.8", virtualbox__intnet: "intnet"
+		nfs.vm.box = "chef/centos-6.5"
+		nfs.vm.provider "virtualbox" do |vb|
+			vb.name = "nfs"
+			vb.gui = true
+		end
+		config.vm.provision "chef_solo" do |chef|	
+			chef.cookbooks_path = "cookbooks"
+			chef.roles_path = "roles"
+			chef.add_role("nfs")
+			chef.json = {
+			"wordpress" => {
+				"db" => {
+					"host" => "192.168.50.8",
+					"server" => "192.168.50.7"
+					}
+				}
+			}
+		end	
+	end		
 #		config.vm.provision "shell",
 #			inline: "sudo rpm -i /vagrant/chef-12.0.3-1.x86_64.rpm"
 	{"wp01" => "192.168.50.4", "wp02" => "192.168.50.5"}.each do |wpp, ip|
@@ -54,58 +105,6 @@ Vagrant.configure(2) do |config|
 			chef.json = {
 			'loadbalancer' => {
 				'upstream_servers' => ["192.168.50.4:80", "192.168.50.5:80"]
-				}
-			}
-		end	
-	end	
-	config.vm.define "db" do |db|
-		db.vm.synced_folder "./chef_rpm", "/vagrant", type: "rsync"
-		db.librarian_chef.cheffile_dir = "."
-		config.vm.provision "shell",
-			inline: "sudo rpm -i /vagrant/chef-12.0.3-1.x86_64.rpm"
-		db.vm.hostname = "db"
-		db.vm.network "private_network", ip: "192.168.50.7", virtualbox__intnet: "intnet"
-		db.vm.box = "chef/centos-6.5"
-		db.vm.provider "virtualbox" do |vb|
-			vb.name = "db"
-			vb.gui = true
-		end
-		config.vm.provision "chef_solo" do |chef|
-			chef.cookbooks_path = "cookbooks"
-			chef.roles_path = "roles"
-			chef.add_role("database")
-			chef.json = {
-			"wordpress" => {
-				"db" => {
-					"host" => "192.168.50.7",
-					"server" => "%"
-					}
-				}
-			}
-		end	
-	end	
-	config.vm.define "nfs" do |nfs|
-		nfs.vm.synced_folder "./chef_rpm", "/vagrant", type: "rsync"
-		nfs.librarian_chef.cheffile_dir = "."
-		config.vm.provision "shell",
-			inline: "sudo rpm -i /vagrant/chef-12.0.3-1.x86_64.rpm"
-		nfs.vm.hostname = "nfs"
-		nfs.vm.network "private_network", ip: "192.168.50.8", virtualbox__intnet: "intnet"
-		nfs.vm.box = "chef/centos-6.5"
-		nfs.vm.provider "virtualbox" do |vb|
-			vb.name = "nfs"
-			vb.gui = true
-		end
-		config.vm.provision "chef_solo" do |chef|	
-			chef.cookbooks_path = "cookbooks"
-			chef.roles_path = "roles"
-			chef.add_role("nfs")
-			chef.json = {
-			"wordpress" => {
-				"db" => {
-					"host" => "192.168.50.8",
-					"server" => "192.168.50.7"
-					}
 				}
 			}
 		end	
