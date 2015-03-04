@@ -30,22 +30,22 @@ Vagrant.configure(2) do |config|
 			}
 		end	
 	end	
-		config.vm.define "nfs" do |nfs|
-		nfs.vm.synced_folder "./chef_rpm", "/vagrant", type: "rsync"
-		nfs.librarian_chef.cheffile_dir = "."
+		config.vm.define "wordpress" do |wordpress||
+		wordpress.vm.synced_folder "./chef_rpm", "/vagrant", type: "rsync"
+		wordpress.librarian_chef.cheffile_dir = "."
 		config.vm.provision "shell",
 			inline: "sudo rpm -i /vagrant/chef-12.0.3-1.x86_64.rpm"
-		nfs.vm.hostname = "nfs"
-		nfs.vm.network "private_network", ip: "192.168.50.8", virtualbox__intnet: "intnet"
-		nfs.vm.box = "chef/centos-6.5"
-		nfs.vm.provider "virtualbox" do |vb|
-			vb.name = "nfs"
+		wordpress.vm.hostname = "wordpress"
+		wordpress.vm.network "private_network", ip: "192.168.50.8", virtualbox__intnet: "intnet"
+		wordpress.vm.box = "chef/centos-6.5"
+		wordpress.vm.provider "virtualbox" do |vb|
+			vb.name = "wordpress"
 			vb.gui = true
 		end
 		config.vm.provision "chef_solo" do |chef|	
 			chef.cookbooks_path = "cookbooks"
 			chef.roles_path = "roles"
-			chef.add_role("nfs")
+			chef.add_role("wordpress")
 			chef.json = {
 			"wordpress" => {
 				"db" => {
