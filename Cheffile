@@ -18,7 +18,7 @@ cookbook "apache2", ">= 0.99.4"
 cookbook "mysql", ">= 1.0.5"
 cookbook "build-essential"
 cookbook "iis", ">= 1.6.2"
-cookbook "openssl"
+cookbook "openssl", "= 2.0.2"
 cookbook "php"
 cookbook "wordpress",
   :git => 'https://github.com/derbandn/wordpress'
